@@ -146,7 +146,7 @@ base = base + theme_classic() + theme(panel.grid.major.y = element_line(colour =
  plot1 = base + geom_bar(fill = brewer.pal(5,"Blues")[3], stat = 'identity')
  
 # Adding title and caption
-plot2 = plot1 + labs(title = titleText, x = "Industry Affected", y = "Percent of Data Breaches", caption = sourceText)
+plot2 = plot1 + labs(title = titleText, x = "Industry Exposed", y = "Percent of Data Breaches", caption = sourceText)
 
 # Customizing and labeling the values on the Y-axis with a % suffix:
 plot3 = plot2 + scale_y_continuous (breaks = c(0, 10, 20, 30, 40, 50), limits = c(0, 50), labels = unit_format(suffix = '%')) 
