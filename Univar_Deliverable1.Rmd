@@ -1,0 +1,168 @@
+PUBPOL 543
+
+Deliverable 1: 
+
+Note: The dataset used for this assignment was sourced from the US Government's open data repository: https://catalog.data.gov/. 
+
+The dataset contains information on data breach incidents reported by legal entities from different industries. In this, the Washington state laws requires legal entities to notify authorities whenever they have been exposed to data breaches compromising information on more than 500 Washingtonians. 
+
+```{r}
+#Providing the link to the data in the Github repository:
+location='https://github.com/elenapopic543/Univariate_Deliverable1/raw/main/'
+file='Data_Breach_Notifications_Affecting_Washington_Residents.csv'
+link=paste0(location,file)
+
+#Reading-in the data from the Github repository location:
+data1 <- read.csv(file=url(link), header=TRUE, stringsAsFactors=FALSE)
+```
+
+```{r}
+#Examining the variables in the dataframe:
+names(data1)
+```
+
+```{r}
+#Examining data types:
+str(data1,width = 70,strict.width='cut')
+```
+
+```{r}
+#Examining raw values:
+head(data1$IndustryType,20) 
+```
+
+
+```{r}
+#Creating a frequency table:
+absoluteT=table(data1$IndustryType,
+                exclude = 'nothing')
+absoluteT
+```
+
+```{r}
+#Transforming the counts into proportions:
+prop.table(absoluteT)
+```
+
+```{r}
+#Translating proportions into percents:
+propT=prop.table(absoluteT)*100
+propT
+```
+
+```{r}
+#Turning the frequency table into a dataframe:
+(tableFreq=as.data.frame(absoluteT))
+```
+
+```{r}
+#Renaming columns:
+names(tableFreq)=c("Industry","Count")
+#Adding percents:
+tableFreq$Percent=as.vector(propT)
+tableFreq
+```
+
+```{r}
+library(ggplot2)
+#Creating the base object:
+base = ggplot(data = tableFreq, 
+             aes(x = Industry,
+                 y = Count))
+#Adding layers to create default barplot:
+plot1 = base + geom_bar(fill ="gray",
+                        stat = 'identity') 
+#plot1
+```
+
+```{r}
+#Adding titles:
+titleText='Industries Affected by Data Breaches in Washington State (2016-2022)'
+sourceText='Source: DATA.GOV'
+
+plot2 = plot1 + labs(title=titleText,
+                     x =NULL, 
+                     y = NULL,
+                     caption = sourceText) 
+#plot2
+```
+
+```{r}
+#Using percent values instead of counts on the Y-axis:
+base= ggplot(data = tableFreq, 
+             aes(x = Industry,
+                 y = Percent)) 
+plot1 = base + geom_bar(fill ="gray",
+                        stat = 'identity') 
+plot2 = plot1 + labs(title=titleText,
+                     x =NULL, 
+                     y = NULL,
+                     caption = sourceText)
+#Customizing the axes:
+library(scales) 
+plot3 = plot2 + scale_y_continuous(breaks=c(0,10,20,30,40,50),
+                                   limits = c(0,50), 
+                                   labels=unit_format(suffix = '%')) 
+#plot3
+```
+
+```{r}
+#Adding the actual percent values (rounded to two decimal places):
+paste0(round(tableFreq$Percent,2), '%')
+```
+
+```{r}
+#Generating values for column labels
+LABELS = paste0(round(tableFreq$Percent,2), '%')
+```
+
+```{r}
+#Ordering the bars by height:
+tableFreq=tableFreq[order(tableFreq$Percent),]
+tableFreq
+#Saving the order:
+(industriesOrd=tableFreq[order(tableFreq$Percent),'Industry'])
+```
+
+Consolidating the code and generating the final barplot:
+
+```{r}
+
+#Specifying the base of the plot
+base = ggplot(data = tableFreq, 
+              aes(x = Industry,y = Percent)) 
+
+#Ordering the bars by height:
+base = base + scale_x_discrete(limits=industriesOrd) 
+
+#Changing the theme to classic
+base = base + theme_classic()
+
+#Adding layers to the base 
+plot1 = base + geom_bar(fill ="blue1",
+                        stat = 'identity')
+
+#Adding title and caption
+plot2 = plot1 + labs(title=titleText,
+                     x =NULL, 
+                     y = NULL,
+                     caption = sourceText)
+
+#Customizing and labeling the values on the Y-axis with a % suffix:
+plot3 = plot2 + scale_y_continuous (breaks=c(0,10,20,30,40,50),
+                                   limits = c(0,50),
+                                   labels=unit_format(suffix = '%')) 
+
+#Moving the plot title to the center, and caption to left: 
+plot4 = plot3 + theme(plot.caption = element_text(hjust = 0),
+                      plot.title = element_text(hjust = 0.5))
+
+#Adding column labels
+plot5 = plot4 + geom_text(vjust=0, 
+                          size = 3.5,
+                          aes(y = Percent,
+                          label = LABELS))
+plot5
+```
+
+
