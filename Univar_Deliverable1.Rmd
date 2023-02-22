@@ -1,8 +1,8 @@
 PUBPOL 543
 
-Deliverable 1: 
+Deliverable 1: "Univariate Plot"
 
-Note: The dataset used for this assignment was sourced from the US Government's open data repository: https://catalog.data.gov/. 
+Note: The dataset used for this assignment was sourced from the US Government's open data repository: https://catalog.data.gov/ (last accessed, February 5, 2023) 
 
 The dataset contains information on data breach incidents reported by legal entities from different industries. In this, the Washington state laws requires legal entities to notify authorities whenever they have been exposed to data breaches compromising information on more than 500 Washingtonians. 
 
@@ -77,7 +77,7 @@ plot1 = base + geom_bar(fill ="gray",
 
 ```{r}
 #Adding titles:
-titleText='Industries Affected by Data Breaches in Washington State (2016-2022)'
+titleText='Data Breach Incidents by Industry in Washington State (2016-2022)'
 sourceText='Source: DATA.GOV'
 
 plot2 = plot1 + labs(title=titleText,
@@ -124,45 +124,42 @@ tableFreq
 (industriesOrd=tableFreq[order(tableFreq$Percent),'Industry'])
 ```
 
-Consolidating the code and generating the final barplot:
-
 ```{r}
+#Loading the Color Brewer package:
+library(RColorBrewer)
 
-#Specifying the base of the plot
-base = ggplot(data = tableFreq, 
-              aes(x = Industry,y = Percent)) 
+#Consolidating the code and generating the final plot: 
 
-#Ordering the bars by height:
+# Generating values for column labels
+LABELS = paste0(round(tableFreq$Percent,2), '%')
+
+# Specifying the base of the plot
+base = ggplot(data = tableFreq, aes(x = Industry, y = Percent)) 
+
+# Ordering the bars by height
 base = base + scale_x_discrete(limits=industriesOrd) 
 
-#Changing the theme to classic
-base = base + theme_classic()
+# Changing the theme to classic and adding horizontal lines
+base = base + theme_classic() + theme(panel.grid.major.y = element_line(colour = "gray80", linetype = "dashed"))
 
-#Adding layers to the base 
-plot1 = base + geom_bar(fill ="blue1",
-                        stat = 'identity')
+# Adding layers to the base and defining the color scheme
+ plot1 = base + geom_bar(fill = brewer.pal(5,"Blues")[3], stat = 'identity')
+ 
+# Adding title and caption
+plot2 = plot1 + labs(title = titleText, x = "Industry Affected", y = "Percent of Data Breaches", caption = sourceText)
 
-#Adding title and caption
-plot2 = plot1 + labs(title=titleText,
-                     x =NULL, 
-                     y = NULL,
-                     caption = sourceText)
+# Customizing and labeling the values on the Y-axis with a % suffix:
+plot3 = plot2 + scale_y_continuous (breaks = c(0, 10, 20, 30, 40, 50), limits = c(0, 50), labels = unit_format(suffix = '%')) 
 
-#Customizing and labeling the values on the Y-axis with a % suffix:
-plot3 = plot2 + scale_y_continuous (breaks=c(0,10,20,30,40,50),
-                                   limits = c(0,50),
-                                   labels=unit_format(suffix = '%')) 
+# Moving the plot title to the center, and caption to left, and adjusting spacing:
+plot4 = plot3 + theme(plot.caption = element_text(hjust = 0, margin = margin(t = 5), size=9), 
+                    plot.title = element_text(hjust = 0.5, margin = margin(b = 15), size = 13),
+                      axis.title.x = element_text(margin = margin(t = 8), size=10), 
+                      axis.title.y = element_text(margin = margin(r = 8), size=10))
 
-#Moving the plot title to the center, and caption to left: 
-plot4 = plot3 + theme(plot.caption = element_text(hjust = 0),
-                      plot.title = element_text(hjust = 0.5))
+# Adding column labels and adjusting size/location
+plot5 = plot4 + geom_text(vjust = -0.1, size = 3, aes(y = Percent, label = LABELS))
 
-#Adding column labels
-plot5 = plot4 + geom_text(vjust=0, 
-                          size = 3.5,
-                          aes(y = Percent,
-                          label = LABELS))
+# Displaying the final plot
 plot5
 ```
-
-
