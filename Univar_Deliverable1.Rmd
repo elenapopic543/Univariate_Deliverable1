@@ -18,7 +18,7 @@ data1 <- read.csv(file=url(link), header=TRUE, stringsAsFactors=FALSE)
 
 ```{r}
 #Examining the variables in the dataframe:
-names(data1)
+#names(data1)
 ```
 
 ```{r}
@@ -28,9 +28,16 @@ str(data1,width = 70,strict.width='cut')
 
 ```{r}
 #Examining raw values:
-head(data1$IndustryType,20) 
+#head(data1$IndustryType,20) 
 ```
 
+```{r}
+library(dplyr)
+#Simplifying one of the values in the IndustryType variable: 
+data1 = data1 %>%
+mutate(IndustryType = if_else(IndustryType == "Non-Profit/Charity", "Non-Profit", IndustryType))
+#unique(data1$IndustryType)
+```
 
 ```{r}
 #Creating a frequency table:
@@ -60,7 +67,7 @@ propT
 names(tableFreq)=c("Industry","Count")
 #Adding percents:
 tableFreq$Percent=as.vector(propT)
-tableFreq
+#tableFreq
 ```
 
 ```{r}
@@ -140,7 +147,7 @@ base = ggplot(data = tableFreq, aes(x = Industry, y = Percent))
 base = base + scale_x_discrete(limits=industriesOrd) 
 
 # Changing the theme to classic and adding horizontal lines
-base = base + theme_classic() + theme(panel.grid.major.y = element_line(colour = "gray80", linetype = "dashed"))
+base = base + theme_classic() + theme(panel.grid.major.y = element_line(colour = gray(0.95), linetype = "dashed"))
 
 # Adding layers to the base and defining the color scheme
  plot1 = base + geom_bar(fill = brewer.pal(5,"Blues")[3], stat = 'identity')
